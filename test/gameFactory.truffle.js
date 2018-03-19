@@ -17,8 +17,6 @@ contract("Game Factory", accounts => {
     });
     let rpsAddr = deployTx.logs[0].args.rpsAddr;
     let rockPaperScissors = RockPaperScissors.at(rpsAddr);
-    console.log(rpsAddr);
-    // This transaction reverts... why?
     let stakes = await rockPaperScissors.stakes.call({ from: accounts[0] });
     assert.equal("1000000", stakes);
   });
