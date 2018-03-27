@@ -23,13 +23,33 @@ contract RockPaperScissors {
         player1.addr = _player1;
     }
     
-    function joinGame() public {
+    function joinGame(uint8 _position) public {
         require(state == 0);
-        player2.addr = msg.sender;
-        state = 1;
+        require(_position == 1 || _position == 2);
+        if (_position == 1) {
+            require(player1.addr == 0);
+            player1.addr = msg.sender;
+        } else {
+            require(player2.addr == 0);
+            player2.addr = msg.sender;
+        }
+        if (!(player1.addr == 0) && !(player2.addr == 0)) {
+            state = 1;
+        }
+    }
+
+    function leaveGame() public {
+        require(state == 0);
+        require(msg.sender == player1.addr || msg.sender == player2.addr);
+        if (msg.sender == player1.addr) {
+            player1.addr = 0;
+        } else {
+            player2.addr = 0;
+        }
     }
     
     function commit(bytes32 _hash) public payable onlyPlayers {
+        require(player2.addr != 0);
         require(msg.value == stakes);
         if (msg.sender == player1.addr) {
             player1.entry = _hash;
@@ -72,6 +92,7 @@ contract RockPaperScissors {
     
     function evaluateGame() public {
         require(player1.revealed && player2.revealed);
+        address toPay;
         if (player1.choice == player2.choice) {
             LogTie();
             // how to incentivize calling this if it's a tie?  Waste of gas.
@@ -79,13 +100,22 @@ contract RockPaperScissors {
         } else if (player1.choice - player2.choice == 1 || 
                    player2.choice - player1.choice == 2) { // player 1 wins!
             LogWin(player1.addr);
+            toPay = player1.addr;
+            kickPlayers();
             resetGame();
-            player1.addr.transfer(address(this).balance);
+            toPay.transfer(address(this).balance);
         } else { // player 2 wins!
             LogWin(player2.addr);
+            toPay = player2.addr;
+            kickPlayers();
             resetGame();
-            player2.addr.transfer(address(this).balance);
+            toPay.transfer(address(this).balance);
         }
+    }
+
+    function kickPlayers() private {
+        player1.addr = 0;
+        player2.addr = 0;
     }
     
     function resetGame() private {
@@ -97,6 +127,7 @@ contract RockPaperScissors {
         player2.choice = 0;
         player2.committed = false; 
         player2.revealed = false;
+        state = 0;
     }
     
     function keccakHash(uint _throwChoice, string _salt) public pure returns(bytes32) {

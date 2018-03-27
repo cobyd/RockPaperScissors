@@ -58,7 +58,7 @@ contract("Rock, paper, scissors", accounts => {
     it("Allows player2 to join", async () => {
       let player2 = await rockPaperScissors.player2.call({ from: accounts[0] });
       assert.equal(0, player2[0]);
-      await rockPaperScissors.joinGame({ from: accounts[2] });
+      await rockPaperScissors.joinGame(2, { from: accounts[2] });
       player2 = await rockPaperScissors.player2.call({ from: accounts[0] });
       assert.equal(accounts[2], player2[0]);
     });
@@ -68,7 +68,7 @@ contract("Rock, paper, scissors", accounts => {
     });
     it("Cannot join game after 2 players have joined", async () => {
       try {
-        await rockPaperScissors.joinGame({ from: accounts[2] });
+        await rockPaperScissors.joinGame(2, { from: accounts[2] });
         assert(false, "Should throw in transaction");
       } catch (e) {
         assert(
@@ -85,7 +85,7 @@ contract("Rock, paper, scissors", accounts => {
       rockPaperScissors = await RockPaperScissors.new(oneFinney, accounts[1], {
         from: accounts[0]
       });
-      await rockPaperScissors.joinGame({ from: accounts[2] });
+      await rockPaperScissors.joinGame(2, { from: accounts[2] });
     });
     it("Does not allow player1 to commit without the proper value", async () => {
       let salt = "192837465";
@@ -172,7 +172,7 @@ contract("Rock, paper, scissors", accounts => {
       rockPaperScissors = await RockPaperScissors.new(oneFinney, accounts[1], {
         from: accounts[0]
       });
-      await rockPaperScissors.joinGame({ from: accounts[2] });
+      await rockPaperScissors.joinGame(2, { from: accounts[2] });
     });
     it("Player 2 wins the game", async () => {
       let salt = "192837465";
@@ -213,12 +213,12 @@ contract("Rock, paper, scissors", accounts => {
       let player2 = await rockPaperScissors.player2.call({
         from: accounts[0]
       });
-      assert.equal(player1[0], accounts[1]);
+      assert.equal(player1[0], 0);
       assert.equal(player1[1], 0);
       assert.equal(player1[2], 0);
       assert.equal(player1[3], false);
       assert.equal(player1[4], false);
-      assert.equal(player2[0], accounts[2]);
+      assert.equal(player2[0], 0);
       assert.equal(player2[1], 0);
       assert.equal(player2[2], 0);
       assert.equal(player2[3], false);
@@ -232,6 +232,8 @@ contract("Rock, paper, scissors", accounts => {
       let player2Hash = await rockPaperScissors.keccakHash.call(1, salt, {
         from: accounts[0]
       });
+      await rockPaperScissors.joinGame(1, { from: accounts[1] });
+      await rockPaperScissors.joinGame(2, { from: accounts[2] });
       await rockPaperScissors.commit(player1Hash, {
         from: accounts[1],
         value: oneFinney
