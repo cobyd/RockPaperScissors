@@ -25,8 +25,8 @@ The UI should work after these steps.
 
 ## Screenshots
 
-![1 - Home](https://imgur.com/yDxkLml "Home Page")
+![1 - Home](https://imgur.com/yDxkLml)
 
-![2 - Created a Contract](https://imgur.com/QdUxV9y "After Deploying a Game")
+![2 - Created a Contract](https://imgur.com/QdUxV9y)
 
-![3 - Game Detail](https://imgur.com/SyFJDxb "Game Detail Page")
+![3 - Game Detail](https://imgur.com/SyFJDxb)
